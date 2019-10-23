@@ -1,10 +1,13 @@
+curl -L -o assessment-attempts-20180128-121051-nested.json https://goo.gl/ME6hjp
 docker-compose up -d
 docker-compose logs -f kafka
 docker-compose exec spark bash
 root@7903d73f44ac:/spark-2.2.0-bin-hadoop2.6# ln -s /w205 w205
 exit
 docker-compose exec kafka kafka-topics --create --topic assessments --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:32181
+```
 Created topic assessments.
+```
 docker-compose exec kafka kafka-topics --describe --topic assessments --zookeeper zookeeper:32181
 ```
 Topic:assessments       PartitionCount:1        ReplicationFactor:1     Configs:
@@ -13,8 +16,9 @@ Topic:assessments       PartitionCount:1        ReplicationFactor:1     Configs:
 docker-compose exec mids bash -c "cat /w205/project-2-nobuyamaguchi/assessment-attempts-20180128-121051-nested.json"
 docker-compose exec mids bash -c "cat /w205/project-2-nobuyamaguchi/assessment-attempts-20180128-121051-nested.json  | jq '.'"
 docker-compose exec mids bash -c "cat /w205/project-2-nobuyamaguchi/assessment-attempts-20180128-121051-nested.json | jq '.[]' -c | kafkacat -P -b kafka:29092 -t assessments && echo 'Produced 100 messages.'"
+```
 Produced 100 messages.
-
+```
 docker-compose exec mids bash -c "kafkacat -C -b kafka:29092 -t assessments -o beginning -e"
 ```
 % Reached end of topic assessments [0] at offset 3280: exiting
