@@ -1,5 +1,4 @@
-cp ~/w205/course-content/10-Transforming-Streaming-Data/docker-compose.yml .
-
+cp ~/w205/course-content/11-Storing-Data-III/docker-compose.yml .
 docker-compose up -d
 
 docker-compose ps
@@ -21,7 +20,18 @@ b908037a1bad        confluentinc/cp-kafka:latest       "/etc/confluent/dock…" 
 45c1709d5211        midsw205/spark-python:0.0.5        "docker-entrypoint.s…"   9 minutes ago       Up 9 minutes        0.0.0.0:8888->8888/tcp                    project3nobuyamaguchi_spark_1
 ```
 
+docker-compose logs -f cloudera
+```
+Found 2 items
+drwxrwxrwt   - mapred mapred              0 2018-02-06 18:27 /tmp/hadoop-yarn
+drwx-wx-wx   - root   supergroup          0 2019-11-10 04:56 /tmp/hive
+```
+
 docker-compose exec kafka kafka-topics --create --topic events --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:32181
+
+```
+Created topic events.
+```
 
 cp ~/w205/course-content/10-Transforming-Streaming-Data/game_api_with_extended_json_events.py .
 
@@ -91,12 +101,47 @@ docker-compose exec mids kafkacat -C -b kafka:29092 -t events -o beginning -e
 ```
 {"Host": "localhost:5000", "event_type": "default", "Accept": "*/*", "User-Agent": "curl/7.47.0"}
 {"Host": "localhost:5000", "event_type": "purchase_sword", "Accept": "*/*", "User-Agent": "curl/7.47.0"}
-{"Host": "localhost:5000", "event_type": "purchase_frog", "Accept": "*/*", "User-Agent": "curl/7.47.0"}
 {"Host": "localhost:5000", "event_type": "purchase_knife", "Accept": "*/*", "User-Agent": "curl/7.47.0"}
+{"Host": "localhost:5000", "event_type": "purchase_frog", "Accept": "*/*", "User-Agent": "curl/7.47.0"}
 {"Host": "localhost:5000", "event_type": "ride_horse", "Accept": "*/*", "User-Agent": "curl/7.47.0"}
-% Reached end of topic events [0] at offset 5: exiting
-
+{"Host": "localhost:5000", "event_type": "climb_mountain", "Accept": "*/*", "User-Agent": "curl/7.47.0"}
+% Reached end of topic events [0] at offset 6: exiting
 ```
+docker-compose exec spark bash
+ln -s /w205 w205
+exit
+
+docker-compose exec spark env PYSPARK_DRIVER_PYTHON=jupyter PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port 8888 --ip 0.0.0.0 --allow-root' pyspark
+
+docker-compose exec cloudera hadoop fs -ls /tmp/
+```
+Found 5 items
+drwxr-xr-x   - root   supergroup          0 2019-11-10 05:47 /tmp/default_hits
+drwxr-xr-x   - root   supergroup          0 2019-11-10 05:47 /tmp/extracted_events
+drwxrwxrwt   - mapred mapred              0 2018-02-06 18:27 /tmp/hadoop-yarn
+drwx-wx-wx   - root   supergroup          0 2019-11-10 04:56 /tmp/hive
+drwxr-xr-x   - root   supergroup          0 2019-11-10 05:47 /tmp/sword_purchases
+```
+docker-compose exec cloudera hadoop fs -ls /tmp/sword_purchases
+```
+Found 2 items
+-rw-r--r--   1 root supergroup          0 2019-11-10 05:47 /tmp/sword_purchases/_SUCCESS
+-rw-r--r--   1 root supergroup       1548 2019-11-10 05:47 /tmp/sword_purchases/part-00000-264f825a-86b7-4e79-ab0d-c809af9b7889-c000.snappy.parquet
+```
+docker-compose exec cloudera hadoop fs -ls /tmp/default_hits
+```
+Found 2 items
+-rw-r--r--   1 root supergroup          0 2019-11-10 05:47 /tmp/default_hits/_SUCCESS
+-rw-r--r--   1 root supergroup       1511 2019-11-10 05:47 /tmp/default_hits/part-00000-3d7e0d02-0468-458d-81aa-d031f019549f-c000.snappy.parquet
+```
+
+docker-compose exec cloudera hadoop fs -ls /tmp/extracted_events
+```
+Found 2 items
+-rw-r--r--   1 root supergroup          0 2019-11-10 05:47 /tmp/extracted_events/_SUCCESS
+-rw-r--r--   1 root supergroup       1823 2019-11-10 05:47 /tmp/extracted_events/part-00000-22150a3a-4b8b-4cda-bffb-6a13b1ee3fd6-c000.snappy.parquet
+```
+
 docker-compose down
 
 docker-compose ps

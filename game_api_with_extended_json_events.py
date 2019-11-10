@@ -45,7 +45,7 @@ def ride_a_horse():
 
 @app.route("/climb_a_mountain")
 def climb_a_mountain():
-    climb_mountain_event = {'event_type', 'climb_mountain'}
+    climb_mountain_event = {'event_type': 'climb_mountain'}
     log_to_kafka('events', climb_mountain_event)
     return "Mountain Climbed!\n"
 
