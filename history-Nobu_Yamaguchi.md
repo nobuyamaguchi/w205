@@ -1,23 +1,31 @@
 cp ~/w205/course-content/11-Storing-Data-III/docker-compose.yml .
+cp ~/w205/course-content/12-Querying-Data-II/docker-compose.yml .
 docker-compose up -d
 
 docker-compose ps
 ```
-              Name                           Command            State                    Ports                 
----------------------------------------------------------------------------------------------------------------
-project3nobuyamaguchi_kafka_1       /etc/confluent/docker/run   Up      29092/tcp, 9092/tcp                    
-project3nobuyamaguchi_mids_1        /bin/bash                   Up      0.0.0.0:5000->5000/tcp, 8888/tcp       
-project3nobuyamaguchi_spark_1       docker-entrypoint.sh bash   Up      0.0.0.0:8888->8888/tcp                 
-project3nobuyamaguchi_zookeeper_1   /etc/confluent/docker/run   Up      2181/tcp, 2888/tcp, 32181/tcp, 3888/tcp
+             Name                          Command            State               Ports             
+----------------------------------------------------------------------------------------------------
+project3nobuyamaguchi_cloudera_   cdh_startup_script.sh       Up      11000/tcp, 11443/tcp,         
+1                                                                     19888/tcp, 50070/tcp,         
+                                                                      8020/tcp, 8088/tcp, 8888/tcp, 
+                                                                      9090/tcp                      
+project3nobuyamaguchi_kafka_1     /etc/confluent/docker/run   Up      29092/tcp, 9092/tcp           
+project3nobuyamaguchi_mids_1      /bin/bash                   Up      0.0.0.0:5000->5000/tcp,       
+                                                                      8888/tcp                      
+project3nobuyamaguchi_spark_1     docker-entrypoint.sh bash   Up      0.0.0.0:8888->8888/tcp        
+project3nobuyamaguchi_zookeeper   /etc/confluent/docker/run   Up      2181/tcp, 2888/tcp, 32181/tcp,
+_1                                                                    3888/tcp   
 ```
 
 docker ps -a
 ```
-CONTAINER ID        IMAGE                              COMMAND                  CREATED             STATUS              PORTS                                     NAMES
-b908037a1bad        confluentinc/cp-kafka:latest       "/etc/confluent/dock…"   9 minutes ago       Up 9 minutes        9092/tcp, 29092/tcp                       project3nobuyamaguchi_kafka_1
-4f50c793c5a6        midsw205/base:0.1.8                "/bin/bash"              9 minutes ago       Up 9 minutes        0.0.0.0:5000->5000/tcp, 8888/tcp          project3nobuyamaguchi_mids_1
-0f52404b80dd        confluentinc/cp-zookeeper:latest   "/etc/confluent/dock…"   9 minutes ago       Up 9 minutes        2181/tcp, 2888/tcp, 3888/tcp, 32181/tcp   project3nobuyamaguchi_zookeeper_1
-45c1709d5211        midsw205/spark-python:0.0.5        "docker-entrypoint.s…"   9 minutes ago       Up 9 minutes        0.0.0.0:8888->8888/tcp                    project3nobuyamaguchi_spark_1
+CONTAINER ID        IMAGE                              COMMAND                  CREATED             STATUS              PORTS                                                                                NAMES
+36e787318171        confluentinc/cp-kafka:latest       "/etc/confluent/dock…"   3 minutes ago       Up 3 minutes        9092/tcp, 29092/tcp                                                                  project3nobuyamaguchi_kafka_1
+becebddc31e3        midsw205/spark-python:0.0.5        "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes        0.0.0.0:8888->8888/tcp                                                               project3nobuyamaguchi_spark_1
+3056bfd9065c        confluentinc/cp-zookeeper:latest   "/etc/confluent/dock…"   3 minutes ago       Up 3 minutes        2181/tcp, 2888/tcp, 3888/tcp, 32181/tcp                                              project3nobuyamaguchi_zookeeper_1
+1a1e14781b82        midsw205/base:0.1.9                "/bin/bash"              3 minutes ago       Up 3 minutes        0.0.0.0:5000->5000/tcp, 8888/tcp                                                     project3nobuyamaguchi_mids_1
+3c91e47c01bb        midsw205/cdh-minimal:latest        "cdh_startup_script.…"   3 minutes ago       Up 3 minutes        8020/tcp, 8088/tcp, 8888/tcp, 9090/tcp, 11000/tcp, 11443/tcp, 19888/tcp, 50070/tcp   project3nobuyamaguchi_cloudera_1
 ```
 
 docker-compose logs -f cloudera
@@ -91,6 +99,25 @@ def climb_a_mountain():
     log_to_kafka('events', climb_mountain_event)
     return "Mountain Climbed!\n"
 ```
+
+docker-compose exec mids kafkacat -C -b kafka:29092 -t events -o beginning
+
+docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/
+docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_sword
+docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_knife
+docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_frog
+docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/ride_a_horse
+docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/climb_a_mountain
+docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/
+docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/purchase_a_sword
+docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/purchase_a_knife
+docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/purchase_a_frog
+docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/ride_a_horse
+docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/climb_a_mountain
+
+
+
+
 docker-compose exec mids curl http://localhost:5000/
 docker-compose exec mids curl http://localhost:5000/purchase_a_sword
 docker-compose exec mids curl http://localhost:5000/purchase_a_frog
