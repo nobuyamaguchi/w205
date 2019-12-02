@@ -100,8 +100,11 @@ def climb_a_mountain():
     return "Mountain Climbed!\n"
 ```
 
+```
 docker-compose exec mids kafkacat -C -b kafka:29092 -t events -o beginning
+```
 
+```
 docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/
 docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_sword
 docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_knife
@@ -114,17 +117,17 @@ docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000
 docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/purchase_a_frog
 docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/ride_a_horse
 docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/climb_a_mountain
+```
 
 
-
-
+```
 docker-compose exec mids curl http://localhost:5000/
 docker-compose exec mids curl http://localhost:5000/purchase_a_sword
 docker-compose exec mids curl http://localhost:5000/purchase_a_frog
 docker-compose exec mids curl http://localhost:5000/purchase_a_knife
 docker-compose exec mids curl http://localhost:5000/ride_a_horse
+```
 
-docker-compose exec mids kafkacat -C -b kafka:29092 -t events -o beginning -e
 ```
 {"Host": "localhost:5000", "event_type": "default", "Accept": "*/*", "User-Agent": "curl/7.47.0"}
 {"Host": "localhost:5000", "event_type": "purchase_sword", "Accept": "*/*", "User-Agent": "curl/7.47.0"}
