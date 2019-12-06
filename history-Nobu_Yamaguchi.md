@@ -11,18 +11,16 @@ check the status
 docker-compose ps
 ```
 ```
-             Name                          Command            State               Ports             
-----------------------------------------------------------------------------------------------------
-project3nobuyamaguchi_cloudera_   cdh_startup_script.sh       Up      11000/tcp, 11443/tcp,         
-1                                                                     19888/tcp, 50070/tcp,         
-                                                                      8020/tcp, 8088/tcp, 8888/tcp, 
-                                                                      9090/tcp                      
-project3nobuyamaguchi_kafka_1     /etc/confluent/docker/run   Up      29092/tcp, 9092/tcp           
-project3nobuyamaguchi_mids_1      /bin/bash                   Up      0.0.0.0:5000->5000/tcp,       
-                                                                      8888/tcp                      
-project3nobuyamaguchi_spark_1     docker-entrypoint.sh bash   Up      0.0.0.0:8888->8888/tcp        
-project3nobuyamaguchi_zookeeper   /etc/confluent/docker/run   Up      2181/tcp, 2888/tcp, 32181/tcp,
-_1                                                                    3888/tcp   
+              Name                             Command               State                   Ports                 
+-------------------------------------------------------------------------------------------------------------------
+project3nobuyamaguchi_cloudera_1    /usr/bin/docker-entrypoint ...   Up      10000/tcp, 50070/tcp, 8020/tcp,       
+                                                                             8888/tcp, 9083/tcp                    
+project3nobuyamaguchi_kafka_1       /etc/confluent/docker/run        Up      29092/tcp, 9092/tcp                   
+project3nobuyamaguchi_mids_1        /bin/bash                        Up      0.0.0.0:5000->5000/tcp, 8888/tcp      
+project3nobuyamaguchi_presto_1      /usr/bin/docker-entrypoint ...   Up      8080/tcp                              
+project3nobuyamaguchi_spark_1       docker-entrypoint.sh bash        Up      0.0.0.0:8888->8888/tcp                
+project3nobuyamaguchi_zookeeper_1   /etc/confluent/docker/run        Up      2181/tcp, 2888/tcp, 32181/tcp,        
+                                                                             3888/tcp   
 ```
 ```
 docker ps -a
@@ -38,11 +36,6 @@ becebddc31e3        midsw205/spark-python:0.0.5        "docker-entrypoint.s…" 
 showing vitual console for the cloudera hadoop hdfs containe
 ```
 docker-compose logs -f cloudera
-```
-```
-Found 2 items
-drwxrwxrwt   - mapred mapred              0 2018-02-06 18:27 /tmp/hadoop-yarn
-drwx-wx-wx   - root   supergroup          0 2019-11-10 04:56 /tmp/hive
 ```
 create a topic
 ```
@@ -201,6 +194,127 @@ Found 2 items
 -rw-r--r--   1 root supergroup          0 2019-11-10 05:47 /tmp/extracted_events/_SUCCESS
 -rw-r--r--   1 root supergroup       1823 2019-11-10 05:47 /tmp/extracted_events/part-00000-22150a3a-4b8b-4cda-bffb-6a13b1ee3fd6-c000.snappy.parquet
 ```
+
+Query with Presto
+```
+docker-compose exec presto presto --server presto:8080 --catalog hive --schema default
+```
+check the tables
+```
+show tables;
+```
+
+```
+      Table      
+-----------------
+ purchase_events 
+ purchases       
+ ride_events     
+ rides           
+(4 rows)
+```
+
+```
+describe purchase_events;
+```
+```
+   Column   |  Type   | Comment 
+------------+---------+---------
+ accept     | varchar |         
+ host       | varchar |         
+ user-agent | varchar |         
+ event_type | varchar |         
+ timestamp  | varchar |         
+(5 rows)
+```
+
+```
+describe purchases;
+```
+```
+   Column   |  Type   | Comment 
+------------+---------+---------
+ accept     | varchar |         
+ host       | varchar |         
+ user-agent | varchar |         
+ event_type | varchar |         
+ timestamp  | varchar |         
+(5 rows)
+```
+Query purchases table
+```
+select count(*) from purchases;
+```
+```
+ _col0 
+-------
+    20 
+(1 row)
+```
+```
+select * from purchases;
+```
+```
+ accept |       host        |   user-agent    |   event_type   |        timestamp        
+--------+-------------------+-----------------+----------------+-------------------------
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.214 
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.228 
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.232 
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.235 
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.239 
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.246 
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.252 
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.261 
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.266 
+ */*    | user1.comcast.com | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:43:02.279 
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:12.977 
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:12.98  
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:12.985 
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:12.988 
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:12.995 
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:13.002 
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:13.01  
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:13.016 
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:13.023 
+ */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:13.034 
+(20 rows)
+```
+
+```{sql}
+select * from rides where host = 'user2.att.com';
+```
+```
+ accept |     host      |   user-agent    | event_type |        timestamp        
+--------+---------------+-----------------+------------+-------------------------
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.128 
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.137 
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.142 
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.152 
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.155 
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.159 
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.163 
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.171 
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.18  
+ */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.195 
+(10 rows)
+```
+
+Write from a stream
+```
+while true; do docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_sword; done
+```
+```
+docker-compose exec cloudera hadoop fs -ls /tmp/sword_purchases
+```
+```
+Found 3 items
+drwxr-xr-x   - root supergroup          0 2019-12-06 05:27 /tmp/sword_purchases/_spark_metadata
+-rw-r--r--   1 root supergroup        688 2019-12-06 05:27 /tmp/sword_purchases/part-00000-ad0bdd9f-fb91-4f41-a067-27c4b736e019-c000.snappy.parquet
+-rw-r--r--   1 root supergroup       2459 2019-12-06 05:27 /tmp/sword_purchases/part-00000-ccedace1-506b-4560-bb92-3bf6b7b23868-c000.snappy.parquet
+```
+
+
+
 down
 ```
 docker-compose down
