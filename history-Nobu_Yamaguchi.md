@@ -1,8 +1,8 @@
 
 Copy yml file and spin up the cluster
+(see docker-compose.yml to see the version after I edited the file)
 ```
-cp ~/w205/course-content/11-Storing-Data-III/docker-compose.yml .
-cp ~/w205/course-content/12-Querying-Data-II/docker-compose.yml .
+cp ~/w205/course-content/13-Understanding-Data/docker-compose.yml .
 docker-compose up -d
 ```
 
@@ -54,7 +54,7 @@ run flask
 docker-compose exec mids env FLASK_APP=/w205/project-3-nobuyamaguchi/game_api_with_extended_json_events.py flask run --host 0.0.0.0
 ```
 game_api_with_extended_json_events.py
-```
+```python
 !/usr/bin/env python
 import json
 from kafka import KafkaProducer
@@ -214,6 +214,7 @@ show tables;
 (4 rows)
 ```
 
+I showed description of two tables below.
 ```
 describe purchase_events;
 ```
@@ -242,7 +243,7 @@ describe purchases;
 (5 rows)
 ```
 Query purchases table
-```
+```sql
 select count(*) from purchases;
 ```
 ```
@@ -251,7 +252,7 @@ select count(*) from purchases;
     20 
 (1 row)
 ```
-```
+```sql
 select * from purchases;
 ```
 ```
@@ -279,8 +280,11 @@ select * from purchases;
  */*    | user2.att.com     | ApacheBench/2.3 | purchase_sword | 2019-12-06 04:44:13.034 
 (20 rows)
 ```
+There are 20 rows in 'purchases' table.
 
-```{sql}
+
+
+```sql
 select * from rides where host = 'user2.att.com';
 ```
 ```
@@ -298,6 +302,7 @@ select * from rides where host = 'user2.att.com';
  */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.195 
 (10 rows)
 ```
+There are 10 rows which have 'user2.att.com' in the column 'host' in 'rides' table.
 
 Write from a stream
 ```
