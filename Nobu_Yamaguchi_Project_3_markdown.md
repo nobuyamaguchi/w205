@@ -312,19 +312,8 @@ Write from a stream
 while true; do docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_sword; done
 ```
 ```
-while true; do docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_sword; done
+while true; do docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/join_a_guild; done
 ```
-
-```
-docker-compose exec cloudera hadoop fs -ls /tmp/sword_purchases
-```
-```
-Found 3 items
-drwxr-xr-x   - root supergroup          0 2019-12-06 05:27 /tmp/sword_purchases/_spark_metadata
--rw-r--r--   1 root supergroup        688 2019-12-06 05:27 /tmp/sword_purchases/part-00000-ad0bdd9f-fb91-4f41-a067-27c4b736e019-c000.snappy.parquet
--rw-r--r--   1 root supergroup       2459 2019-12-06 05:27 /tmp/sword_purchases/part-00000-ccedace1-506b-4560-bb92-3bf6b7b23868-c000.snappy.parquet
-```
-
 
 
 down
