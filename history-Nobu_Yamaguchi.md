@@ -107,6 +107,15 @@ def climb_a_mountain():
     climb_mountain_event = {'event_type', 'climb_mountain'}
     log_to_kafka('events', climb_mountain_event)
     return "Mountain Climbed!\n"
+
+@app.route("/join_a_guild")
+def join_a_guild():
+    join_guild_event = {'event_type': 'join_guild'}
+    log_to_kafka('events', join_guild_event)
+    return "Guild Joined!\n"
+
+
+
 ```
 
 set up to watch kafka
@@ -122,15 +131,17 @@ docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:
 docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_frog
 docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/ride_a_horse
 docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/climb_a_mountain
+docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/join_a_guild
 docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/
 docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/purchase_a_sword
 docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/purchase_a_knife
 docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/purchase_a_frog
 docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/ride_a_horse
 docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/climb_a_mountain
+docker-compose exec mids ab -n 10 -H "Host: user2.att.com" http://localhost:5000/join_a_guild
 ```
 
-
+Curl version
 ```
 docker-compose exec mids curl http://localhost:5000/
 docker-compose exec mids curl http://localhost:5000/purchase_a_sword
@@ -207,10 +218,10 @@ show tables;
 ```
       Table      
 -----------------
+ join_events     
+ joins           
  purchase_events 
  purchases       
- ride_events     
- rides           
 (4 rows)
 ```
 
@@ -285,29 +296,33 @@ There are 20 rows in 'purchases' table.
 
 
 ```sql
-select * from rides where host = 'user2.att.com';
+select * from joins where host = 'user2.att.com';
 ```
 ```
  accept |     host      |   user-agent    | event_type |        timestamp        
 --------+---------------+-----------------+------------+-------------------------
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.128 
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.137 
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.142 
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.152 
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.155 
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.159 
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.163 
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.171 
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.18  
- */*    | user2.att.com | ApacheBench/2.3 | ride_horse | 2019-12-06 04:44:45.195 
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.155 
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.159 
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.162 
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.171 
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.174 
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.177 
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.18  
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.182 
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.185 
+ */*    | user2.att.com | ApacheBench/2.3 | join_guild | 2019-12-07 23:11:34.188 
 (10 rows)
 ```
-There are 10 rows which have 'user2.att.com' in the column 'host' in 'rides' table.
+There are 10 rows which have 'user2.att.com' in the column 'host' in 'joins' table.
 
 Write from a stream
 ```
 while true; do docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_sword; done
 ```
+```
+while true; do docker-compose exec mids ab -n 10 -H "Host: user1.comcast.com" http://localhost:5000/purchase_a_sword; done
+```
+
 ```
 docker-compose exec cloudera hadoop fs -ls /tmp/sword_purchases
 ```

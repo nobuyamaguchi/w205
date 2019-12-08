@@ -50,4 +50,10 @@ def climb_a_mountain():
     log_to_kafka('events', climb_mountain_event)
     return "Mountain Climbed!\n"
 
+@app.route("/join_a_guild")
+def join_a_guild():
+    join_guild_event = {'event_type': 'join_guild'}
+    log_to_kafka('events', join_guild_event)
+    return "Guild Joined!\n"
+
 
