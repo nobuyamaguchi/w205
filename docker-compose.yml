@@ -11,8 +11,11 @@ services:
       - "2888"
       - "32181"
       - "3888"
+<<<<<<< HEAD
     extra_hosts:
       - "moby:127.0.0.1"
+=======
+>>>>>>> 834254ebc5f6a80299bdb6cf786b5f873fef2827
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -26,6 +29,7 @@ services:
     expose:
       - "9092"
       - "29092"
+<<<<<<< HEAD
     extra_hosts:
       - "moby:127.0.0.1"
 
@@ -45,18 +49,37 @@ services:
 
   spark:
     image: midsw205/spark-python:0.0.6
+=======
+
+  cloudera:
+    image: midsw205/cdh-minimal:latest
+    expose:
+      - "8020" # nn
+      - "50070" # nn http
+      - "8888" # hue
+    #ports:
+    #- "8888:8888"
+
+  spark:
+    image: midsw205/spark-python:0.0.5
+>>>>>>> 834254ebc5f6a80299bdb6cf786b5f873fef2827
     stdin_open: true
     tty: true
     volumes:
       - ~/w205:/w205
+<<<<<<< HEAD
     expose:
       - "8888"
     ports:
       - "8888:8888"
+=======
+    command: bash
+>>>>>>> 834254ebc5f6a80299bdb6cf786b5f873fef2827
     depends_on:
       - cloudera
     environment:
       HADOOP_NAMENODE: cloudera
+<<<<<<< HEAD
       HIVE_THRIFTSERVER: cloudera:9083
     extra_hosts:
       - "moby:127.0.0.1"
@@ -76,10 +99,20 @@ services:
 
   mids:
     image: midsw205/base:0.1.9
+=======
+    expose:
+      - "8888"
+    ports:
+      - "8888:8888"
+
+  mids:
+    image: midsw205/base:latest
+>>>>>>> 834254ebc5f6a80299bdb6cf786b5f873fef2827
     stdin_open: true
     tty: true
     volumes:
       - ~/w205:/w205
+<<<<<<< HEAD
     expose:
       - "5000"
     ports:
@@ -87,3 +120,5 @@ services:
     extra_hosts:
       - "moby:127.0.0.1"
 
+=======
+>>>>>>> 834254ebc5f6a80299bdb6cf786b5f873fef2827
